@@ -118,38 +118,39 @@ sasha.info()
 
 */
 
-function chekNullString(String1, String2){   //проверка на пусты поля
+function chekNullString(String1, String2){   //Проверка на пустые поля. Ты говорил про правило програмиста не повторяйся "Don't repeat yourself" 
     if(String1 != '' && String2 != '') return true
     else return false
 }
 
 
 function addMechnic(name, specification, mechanic){
-    if(name != '' && specification != ''){
-        specification = specification.split(', ')
-        if(specification.length > 4){return false}
-        for(let numSpec of specification){
-            if(isNaN(numSpec) == false && numSpec < 5 && numSpec > 0){}
-            else return false
-        }
-        specification.sort()
-        idxMehanic++
-        mechanic.push({
-            id: idxMehanic,
-            name: name,
-            spec: specification,
-            money: 0,
-            rating: 0,
-            clients: [],
-            history: [],
-
-        })
-        return true
-    }else return false
+    if(chekNullString(name, specification) == false)return false
+    specification = specification.split(', ')
+    if(specification.length > 4){return false}
+    for(let numSpec of specification){
+        if(isNaN(numSpec) == false && numSpec < 5 && numSpec > 0){}
+        else return false
+    }
+    specification.sort()
+    idxMehanic++
+    mechanic.push({
+        id: idxMehanic,
+        name: name,
+        spec: specification,
+        money: 0,
+        rating: 0,
+        clients: [],
+        history: [],
+    })
+    return true
 }
 
-function correctMechanik(name, defect){
-    if(name != '' && defect !=''){}
+function correctMechanik(name, defect, mechanic){
+    if(chekNullString(name, defect) == false){return false}
+    
+    let sortMechanic = mechanic.map(sortWorker=>sortWorker.name)
+    console.log(sortMechanic)
 }
 
 
@@ -175,8 +176,8 @@ do{
         }
         case 2:{
             let name = prompt('Введите имя клиента')
-            let defect = prompt('Введите одну неисправность')
-            console.log(correctMechanik(name, defect))
+            let defect = +prompt('Введите одну неисправность')
+            console.log(correctMechanik(name, defect, mechanic))
             break
         }
         case 3:{break}
