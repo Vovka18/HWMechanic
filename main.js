@@ -133,9 +133,7 @@ function addMechnic(name, specification, mechanic){
         else return false
     }
     specification.sort()
-    idxMehanic++
     mechanic.push({
-        id: idxMehanic,
         name: name,
         spec: specification,
         money: 0,
@@ -147,11 +145,45 @@ function addMechnic(name, specification, mechanic){
 }
 
 function correctMechanik(name, defect, mechanic){
-    if(chekNullString(name, defect) == false){return false}
+    if(chekNullString(name, defect) == false || defect.length != 1 || mechanic.length == 0){return `Ошибка`}
     
-    let sortMechanic = mechanic.map(sortWorker=>sortWorker.name)
-    console.log(sortMechanic)
+    let sortMechanic = mechanic.map(sortWorker=>{
+        if(sortWorker.spec.includes(defect) == true){return sortWorker.name}
+        else{}
+    })
+
+    sortMechanic = sortMechanic.join(', ')
+    if(sortMechanic == ''){
+        return false
+    }else{console.log(`Вам подходят ${sortMechanic}`)}
 }
+
+function addClient(name, defect, nameMechanic, mechanic){
+    let  regClient = mechanic.find(worker=>{
+        if(worker.spec.includes(defect) == true && worker.name == nameMechanic){
+            worker.clients.push({name: name, defect: defect})
+            return true
+        }
+    })
+    return regClient
+}
+
+function finishWork(nameClient, rating, mechanic){
+    if(chekNullString(nameClient, rating) == false || rating < 0 || rating > 100){return false}
+
+    mechanic.find(worker=>{
+        let chekClient = worker.clients.forEach(nameClients=>{
+            if(nameClients.name == nameClient){return true}
+            else{}
+        })
+        console.log(chekClient)
+    })
+}
+
+
+
+
+
 
 
 
@@ -160,8 +192,9 @@ function correctMechanik(name, defect, mechanic){
 
 let menu
 
-let idxMehanic = 0
-let mechanic = []
+let mechanic = [
+    {name: 'vova', spec: 1, money: 0, rating: 0, clients: [{name: 'egor', defect: 1}, {name: 'Adolf', defect: 1}], history: []}
+]
 
 do{
     menu = +prompt('STO \n 1 - Добавить работника сто\n 2 - Добавить клиента\n 3 - завершить сделку с клиентом\n 4 - посмотреть общую прибыль сто\n 5 - посмотреть среднюю прибыль каждого сотрудника\n 6 - показать лучшего и худшего сотрудника\n 7 - показать топ 3 лучших сотрудника\n 8 - уволить 2 самых худших сотрудника\n 9 - выписать премию сотрудникам у которых зп больше введенной\n 10 - уволить сотрудника по имени\n 11 - посмотреть всех сотрудников\n 12 - посмотреть историю всех работ\n 13 - Выход')
@@ -170,17 +203,25 @@ do{
         case 1:{
             let name = prompt('Введите имя сотрудника')
             let specification = prompt('Введите специальность:\n 1 - Покраска\n 2 - Двигатель\n 3 - Колеса\n 4 - Ходовая\n(можно ввести несколько вариантов: 1,3)')
-            addMechnic(name, specification, mechanic) ? console.log('Сотрудник добавлен') : console.log('Ошибка')
-            console.log(mechanic)
+            addMechnic(name, specification, mechanic) ? console.log(`Сотрудник ${name} добавлен`) : console.log('Ошибка')
             break
         }
         case 2:{
             let name = prompt('Введите имя клиента')
-            let defect = +prompt('Введите одну неисправность')
-            console.log(correctMechanik(name, defect, mechanic))
+            let defect = prompt('Введите одну неисправность: \n 1 - Покраска\n 2 - Двигатель\n 3 - Колеса\n 4 - Ходовая')
+            if(correctMechanik(name, defect, mechanic) != false){
+                let nameMechanic = prompt("Введите имя механика")
+                addClient(name, defect, nameMechanic, mechanic) ? console.log(`Механик: ${nameMechanic}, Работает с клиентом ${name}`) : console.log('Ошибка')
+                break
+            }else{console.log('Ошибка')}
             break
         }
-        case 3:{break}
+        case 3:{
+            let nameClient = prompt('Введите имя клиента')
+            let rating = +prompt('Введите процент довольности 1 - 100')
+            finishWork(nameClient, rating, mechanic) ? console.log('Сделка закрыта') : console.log('Ошибка')
+            break
+        }
         case 4:{break}
         case 5:{break}
         case 6:{break}
