@@ -104,7 +104,7 @@ sasha.info()
 6.показать лучшего и худшего сотрудника
 7.показать топ 3 лучших сотрудника
 8.уволить 2 самых худших сотрудника
-9.выписать премию сотрудникам у которых зп больше введенной /средней
+9.выписать премию сотрудникам у которых зп больше введенной
     премия                          //ввести зп от которой выдавать премию
     и порого для начисления         //и сколько выдавать премии
 10.уволить сотрудника по имени
@@ -158,12 +158,14 @@ function addMechanic(name, specification, mechanic){
             })
             this.rating += rating
             this.clients.forEach((client, idx)=>{
-                console.log(client.name, name)
                 if(client.name == name) this.clients.splice(idx, 1)
             })
         },
         infoMoney: function() {
             console.log(`Имя: ${this.name}, денги: ${this.money}`)
+        },
+        showMoney: function(){
+            return this.money
         },
 
     })
@@ -222,6 +224,71 @@ function finishWork(name, rating, mechanic){
 }
 
 
+function listRatingMechanic(mechanic){
+    return mechanic.sort((worker1, worker2)=>worker2.rating - worker1.rating)
+}
+
+function showBestWorstWorker(mechanic){
+    if(mechanic.length < 2) return false
+    let sortMeh = listRatingMechanic(mechanic)
+    console.log(`Лучший - ${sortMeh[0].name} с рейтингом ${sortMeh[0].rating}\nХудший - ${sortMeh[sortMeh.length-1].name} с рейтингом ${sortMeh[sortMeh.length-1].rating}`)
+}
+
+function topThreeWorker(mechanic){
+    if(mechanic.length < 3) return false
+    let sortMeh = listRatingMechanic(mechanic)
+    console.log(`TOP3\n1 - ${sortMeh[0].name} с рейтингом ${sortMeh[0].rating}\n2 - ${sortMeh[1].name} с рейтингом ${sortMeh[1].rating}\n2 - ${sortMeh[2].name} с рейтингом ${sortMeh[2].rating}`)
+}
+
+function removeTwoWorstWorker(mechanic){
+    if(mechanic.length < 3) return false
+    let sortMeh = listRatingMechanic(mechanic)
+    console.log(`Механики ${sortMeh[sortMeh.length-1].name} и ${sortMeh[sortMeh.length-2].name} уволены`)
+    sortMeh.pop()
+    sortMeh.pop()
+}
+
+function premiumMechanic(minRating, premium, mechanic){
+    if(mechanic.length < 1) return false
+    mechanic.forEach(worker=>{
+        if(worker.rating > minRating){
+            worker.money += premium
+            console.log(`Премия начислена ${worker.name}`)
+        }else{}
+    })
+}
+
+function removeWorker(name, mechanic){
+    if(mechanic.length == 0 || name == '') return false
+    let chek = false
+    let resultMechanic = mechanic.filter(worker=>{
+        if(worker.name != name) return true
+        else {
+            chek = true
+            return false
+        }
+    })
+    if(chek == true) return resultMechanic
+    else return false
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -245,7 +312,7 @@ do{
         case 1:{
             let name = prompt('Введи имя сотрудника')
             let specification = prompt('Введи специальность:\n 1 - Покраска\n 2 - Двигатель\n 3 - Колеса\n 4 - Ходовая\n(можно ввести несколько вариантов: 1,3)')
-            addMechanic(name, specification, mechanic) ? console.log('Сотрудник добавлен') : console.log('Ошибка')
+            addMechanic(name, specification, mechanic) ? console.log(`Сотрудник ${name} добавлен`) : console.log('Ошибка')
             break
         }
         case 2:{
@@ -255,235 +322,81 @@ do{
             if(correctMechanic(name, defect, mechanic) == false) break
             
             let nameMeh = prompt('Введи имя механика')
-            addClient(name, defect, nameMeh, mechanic) ? console.log('Клиент добавлен') : console.log('Ошибка')
+            addClient(name, defect, nameMeh, mechanic) ? console.log(`Клиент ${name} добавлен`) : console.log('Ошибка')
             break
         }
         case 3:{
             let name = prompt('Имя клиента')
-            let rating = +prompt('Введите процент довольности 1 - 100')
+            let rating = +prompt('Введи процент довольности 1 - 100')
             finishWork(name, rating, mechanic) ? console.log('Сделка закрыта') : console.log('Ошибка')
             break
         }
-        case 4:{break}
+        case 4:{
+            let allMoneySto = 0
+            mechanic.forEach(mehMoney=>allMoneySto += mehMoney.showMoney())
+            console.log(`Общая прибыль сто: ${allMoneySto}`)
+            break
+        }
         case 5:{
             mechanic.forEach(mehMoney=>mehMoney.infoMoney())
             break
         }
-        case 6:{break}
-        case 7:{break}
-        case 8:{break}
-        case 9:{break}
-        case 10:{break}
-        case 11:{break}
-        case 12:{break}
+        case 6:{
+            if(showBestWorstWorker(mechanic) == false) console.log('Ошибка')
+            break
+        }
+        case 7:{
+            if(topThreeWorker(mechanic) == false) console.log('Ошибка')
+            break
+        }
+        case 8:{
+            if(removeTwoWorstWorker(mechanic) == false) console.log('Ошибка')
+            
+            break
+        }
+        case 9:{
+            let minRating = prompt('Введи рейтинг от которого будет выдаваться премия')
+            let premium = +prompt('Введи прмеию') 
+            if(premiumMechanic(minRating, premium, mechanic) == false) console.log('Ошибка')
+            break
+        }
+        case 10:{
+            let name = prompt('Введите имя сотрудника')
+            let resultMechanic = removeWorker(name, mechanic)
+            if(resultMechanic != false){
+                console.log('Сотрудник удален')
+                mechanic = resultMechanic
+                break
+            }
+            else if(resultMechanic == false) console.log('Ошибка')
+            break
+        }
+        case 11:{
+            if(mechanic.length < 1){
+                console.log('Ошибка')
+                break
+            }
+            mechanic.forEach(worker=>{
+                let nameClients = ``
+                worker.clients.forEach(nameClient => nameClients += nameClient.name + ' ')
+                console.log(`Имя: ${worker.name}, рейтинг: ${worker.rating}, деньги: ${worker.money}, клиенты: ${nameClients}`)
+            })
+            break
+        }
+        case 12:{
+            if(mechanic.length < 1){
+                console.log('Ошибка')
+                break
+            }
+            mechanic.forEach(worker=>{
+                if(worker.history.length == 0) return false
+                console.log(worker.name)
+                worker.history.forEach(history=>console.log(`Клиент:  ${history.name} пришел с дефектом ${history.defect}, поставил рейтинг ${history.rating}, заплатил за работу ${history.money}`))
+            })
+            break
+        }
     }
 }while(menu != 13)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//курва
-// function chekNullString(String1, String2){   //Проверка на пустые поля. Ты говорил про правило програмиста не повторяйся "Don't repeat yourself" 
-//     if(String1 != '' && String2 != '') return true
-//     else return false
-// }
-
-
-// function addMechnic(name, specification, mechanic){
-//     if(chekNullString(name, specification) == false)return false
-//     specification = specification.split(', ')
-//     if(specification.length > 4){return false}
-//     for(let numSpec of specification){
-//         if(isNaN(numSpec) == false && numSpec < 5 && numSpec > 0){}
-//         else return false
-//     }
-//     specification.sort()
-//     mechanic.push({
-//         name: name,
-//         spec: specification,
-//         money: 0,
-//         rating: 0,
-//         clients: [],
-//         history: [],
-//     })
-//     return true
-// }
-
-// function correctMechanik(name, defect, mechanic){
-//     if(chekNullString(name, defect) == false || defect.length != 1 || mechanic.length == 0){return `Ошибка`}
-    
-//     let sortMechanic = mechanic.map(sortWorker=>{
-//         if(sortWorker.spec.includes(defect) == true){return sortWorker.name}
-//         else{}
-//     })
-
-//     sortMechanic = sortMechanic.join(', ')
-//     if(sortMechanic == ''){
-//         return false
-//     }else{console.log(`Вам подходят ${sortMechanic}`)}
-// }
-
-// function addClient(name, defect, nameMechanic, mechanic){
-//     let  regClient = mechanic.find(worker=>{
-//         if(worker.spec.includes(defect) == true && worker.name == nameMechanic){
-//             worker.clients.push({name: name, defect: defect})
-//             return true
-//         }
-//     })
-//     return regClient
-// }
-
-// function finishWork(nameClient, rating, mechanic){
-//     if(chekNullString(nameClient, rating) == false || rating < 0 || rating > 100 || mechanic.length == 0){return false}
-
-//     let result = []
-//     let chek = false
-//     mechanic.filter((findMechanic)=>{
-//         let clientsMeh = findMechanic.clients.filter(screachClient =>{
-//             if(screachClient.name == nameClient){
-//                 chek = true   
-//                 findMechanic.rating += rating
-//                 let sum = 0 //создать переменную для суммы
-//                 if(screachClient.defect == 1){sum = 100 / 100 * rating}   //Покраска
-//                 if(screachClient.defect == 2){sum = 300 / 100 * rating}   //Двигатель
-//                 if(screachClient.defect == 3){sum = 30 / 100 * rating}    //Колеса
-//                 if(screachClient.defect == 4){sum = 80 / 100 * rating}    //Ходовая
-//                 findMechanic.money += sum
-//                 return false
-//             }
-//             else{return true}
-//         })
-//         findMechanic.clients = clientsMeh 
-//         result.push(findMechanic)
-//     })
-//     if(chek == true){
-//         console.log('Сделка закрыта')
-//         return result
-//     }else{return false}
-// }
-
-// function showMoneySTO(mechanic){
-//     let sum = 0
-//     mechanic.forEach(worker=>{
-//         sum += worker.money
-//     })
-//     if(sum == 0){
-//         return `Ошибка`
-//     }else{return `Общая прибыль СТО: ${sum}`}
-// }
-
-// function showMoneyMeh(mechanic){
-//         let result = ``
-//         let moneyAllWorker = mechanic.forEach(worker=>{
-//             console.log(`Имя: ${worker.name}, деньги: ${worker.money}\n`)
-//             result += `Имя: ${worker.name}, деньги: ${worker.money}\n`
-//             return result
-//         })
-//         console.log(moneyAllWorker)
-//         return moneyAllWorker
-// }
-
-
-
-
-
-
-
-// let menu
-
-// let mechanic = [
-//     {name: 'vova', spec: 1, money: 123, rating: 0, clients: [{name: 'egor', defect: 1}, {name: 'Adolf', defect: 1}], history: []},
-//     {name: 'egor', spec: 1, money: 111, rating: 0, clients: [{name: 'ivan', defect: 1}, {name: 'Adolf', defect: 1}], history: []}
-// ]
-
-// do{
-//     menu = +prompt('STO \n 1 - Добавить работника сто\n 2 - Добавить клиента\n 3 - завершить сделку с клиентом\n 4 - посмотреть общую прибыль сто\n 5 - посмотреть среднюю прибыль каждого сотрудника\n 6 - показать лучшего и худшего сотрудника\n 7 - показать топ 3 лучших сотрудника\n 8 - уволить 2 самых худших сотрудника\n 9 - выписать премию сотрудникам у которых зп больше введенной\n 10 - уволить сотрудника по имени\n 11 - посмотреть всех сотрудников\n 12 - посмотреть историю всех работ\n 13 - Выход')
-    
-//     switch(menu){
-//         case 1:{
-//             let name = prompt('Введите имя сотрудника')
-//             let specification = prompt('Введите специальность:\n 1 - Покраска\n 2 - Двигатель\n 3 - Колеса\n 4 - Ходовая\n(можно ввести несколько вариантов: 1,3)')
-//             addMechnic(name, specification, mechanic) ? console.log(`Сотрудник ${name} добавлен`) : console.log('Ошибка')
-//             break
-//         }
-//         case 2:{
-//             let name = prompt('Введите имя клиента')
-//             let defect = prompt('Введите одну неисправность: \n 1 - Покраска\n 2 - Двигатель\n 3 - Колеса\n 4 - Ходовая')
-//             if(correctMechanik(name, defect, mechanic) != false){
-//                 let nameMechanic = prompt("Введите имя механика")
-//                 addClient(name, defect, nameMechanic, mechanic) ? console.log(`Механик: ${nameMechanic}, Работает с клиентом ${name}`) : console.log('Ошибка')
-//                 break
-//             }else{console.log('Ошибка')}
-//             break
-//         }
-//         case 3:{
-//             let nameClient = prompt('Введите имя клиента')
-//             let rating = +prompt('Введите процент довольности 1 - 100')
-//             let result = finishWork(nameClient, rating, mechanic)
-//             if(result != false){
-//                 mechanic = result
-//                 break
-//             }else{console.log('Ошибка')}
-//             break
-//         }
-//         case 4:{
-//             console.log(showMoneySTO(mechanic))
-//             break
-//         }
-//         case 5:{
-//             console.log(showMoneyMeh(mechanic))
-//             break
-//         }
-//         case 6:{break}
-//         case 7:{break}
-//         case 8:{break}
-//         case 9:{break}
-//         case 10:{break}
-//         case 11:{break}
-//         case 12:{break}
-//     }
-// }while(menu != 13)
-
-
-
 
 
 
